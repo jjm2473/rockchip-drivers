@@ -135,9 +135,12 @@ static int rga_get_user_pages(struct page **pages, unsigned long Memory,
 	result = get_user_pages_remote(current, current_mm,
 				       Memory << PAGE_SHIFT,
 				       pageCount, writeFlag ? FOLL_WRITE : 0, pages, NULL, NULL);
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(6, 5, 0)
 	result = get_user_pages_remote(current_mm, Memory << PAGE_SHIFT,
 				       pageCount, writeFlag ? FOLL_WRITE : 0, pages, NULL, NULL);
+#else
+	result = get_user_pages_remote(current_mm, Memory << PAGE_SHIFT,
+				       pageCount, writeFlag ? FOLL_WRITE : 0, pages, NULL);
 #endif
 
 	if (result > 0 && result >= pageCount) {
