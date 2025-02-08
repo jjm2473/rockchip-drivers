@@ -19,6 +19,7 @@
 #include <linux/slab.h>
 #include <linux/nospec.h>
 #include <linux/mfd/syscon.h>
+#include <linux/version.h>
 
 #include "mpp_debug.h"
 #include "mpp_common.h"
@@ -361,7 +362,11 @@ static int mpp_service_probe(struct platform_device *pdev)
 	atomic_set(&srv->shutdown_request, 0);
 	platform_set_drvdata(pdev, srv);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 	srv->cls = class_create(THIS_MODULE, MPP_CLASS_NAME);
+#else
+	srv->cls = class_create(MPP_CLASS_NAME);
+#endif
 	if (PTR_ERR_OR_ZERO(srv->cls))
 		return PTR_ERR(srv->cls);
 
