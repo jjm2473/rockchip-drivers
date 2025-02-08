@@ -13,7 +13,11 @@
 #include <linux/debugfs.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+#ifdef CONFIG_DMABUF_CACHE
 #include <linux/dma-buf-cache.h>
+#else
+#include <linux/dma-buf.h>
+#endif
 #include <linux/dma-mapping.h>
 #include <linux/err.h>
 #include <linux/fb.h>

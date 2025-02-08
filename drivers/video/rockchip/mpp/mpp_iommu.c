@@ -9,7 +9,11 @@
  *
  */
 #include <linux/delay.h>
+#ifdef CONFIG_DMABUF_CACHE
 #include <linux/dma-buf-cache.h>
+#else
+#include <linux/dma-buf.h>
+#endif
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
 #include <linux/of.h>
