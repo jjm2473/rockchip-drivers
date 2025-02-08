@@ -37,6 +37,8 @@
 #include "mpp_iommu.h"
 #include <soc/rockchip/rockchip_iommu.h>
 
+#include <compat/iommu.h>
+
 #include "hack/mpp_hack_px30.h"
 
 #define RKVDEC_DRIVER_NAME		"mpp_rkvdec"

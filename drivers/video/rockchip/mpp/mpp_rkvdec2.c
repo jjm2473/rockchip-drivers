@@ -23,6 +23,8 @@
 #include <soc/rockchip/rockchip_system_monitor.h>
 #include <soc/rockchip/rockchip_iommu.h>
 
+#include <compat/iommu.h>
+
 #ifdef CONFIG_PM_DEVFREQ
 #include "../drivers/devfreq/governor.h"
 #endif

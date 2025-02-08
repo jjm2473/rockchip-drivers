@@ -32,6 +32,7 @@
 #include <soc/rockchip/rockchip_opp_select.h>
 #include <soc/rockchip/rockchip_system_monitor.h>
 #include <soc/rockchip/rockchip_iommu.h>
+#include <compat/iommu.h>
 
 #include "mpp_debug.h"
 #include "mpp_iommu.h"

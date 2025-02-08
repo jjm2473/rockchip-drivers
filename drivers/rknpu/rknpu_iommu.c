@@ -10,6 +10,8 @@
 
 #include "rknpu_iommu.h"
 
+#include <compat/iommu.h>
+
 #define RKNPU_SWITCH_DOMAIN_WAIT_TIME_MS 6000
 
 dma_addr_t rknpu_iommu_dma_alloc_iova(struct iommu_domain *domain, size_t size,
