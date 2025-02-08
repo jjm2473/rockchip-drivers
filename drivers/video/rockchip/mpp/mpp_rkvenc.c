@@ -35,7 +35,7 @@
 #include <compat/iommu.h>
 
 #ifdef CONFIG_PM_DEVFREQ
-#include "../../../devfreq/governor.h"
+#include "../drivers/devfreq/governor.h"
 #endif
 
 #include "mpp_debug.h"
