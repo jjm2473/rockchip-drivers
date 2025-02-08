@@ -27,6 +27,8 @@
 #include "rknpu_gem.h"
 #include "rknpu_iommu.h"
 
+#include <compat/iommu.h>
+
 #define RKNPU_GEM_ALLOC_FROM_PAGES 1
 
 #if RKNPU_GEM_ALLOC_FROM_PAGES

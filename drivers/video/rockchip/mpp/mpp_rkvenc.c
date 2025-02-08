@@ -32,6 +32,8 @@
 #include <soc/rockchip/rockchip_opp_select.h>
 #include <soc/rockchip/rockchip_system_monitor.h>
 
+#include <compat/iommu.h>
+
 #ifdef CONFIG_PM_DEVFREQ
 #include "../../../devfreq/governor.h"
 #endif

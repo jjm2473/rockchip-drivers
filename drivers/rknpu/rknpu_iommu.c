@@ -8,6 +8,8 @@
 
 #include "rknpu_iommu.h"
 
+#include <compat/iommu.h>
+
 dma_addr_t rknpu_iommu_dma_alloc_iova(struct iommu_domain *domain, size_t size,
 				      u64 dma_limit, struct device *dev,
 				      bool size_aligned)

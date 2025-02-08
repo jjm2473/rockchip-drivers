@@ -7,6 +7,8 @@
 
 #define pr_fmt(fmt) "rga_dma_buf: " fmt
 
+#include <compat/iommu.h>
+
 #include "rga_dma_buf.h"
 #include "rga.h"
 #include "rga_common.h"
