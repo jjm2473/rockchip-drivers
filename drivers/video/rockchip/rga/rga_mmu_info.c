@@ -428,6 +428,14 @@ static int rga_MapUserMemory(struct page **pages,
                         pte_t       * pte;
                         spinlock_t  * ptl;
                         unsigned long pfn;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
+                        if (follow_pte(current->mm, (Memory + i) << PAGE_SHIFT, &pte, &ptl)) {
+                            pr_err("RGA2 failed to follow_pte, result = %d, pageCount = %d\n",
+                                   result, pageCount);
+                            status = RGA_OUT_OF_RESOURCES;
+                            break;
+                        }
+#else
                         pgd_t * pgd;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 						p4d_t * p4d;
@@ -477,7 +485,7 @@ static int rga_MapUserMemory(struct page **pages,
                         {
                             break;
                         }
-
+#endif
                         pfn = pte_pfn(*pte);
                         Address = ((pfn << PAGE_SHIFT) | (((unsigned long)((Memory + i) << PAGE_SHIFT)) & ~PAGE_MASK));
                         pte_unmap_unlock(pte, ptl);
