@@ -909,12 +909,14 @@ static int rga2_MapUserMemory(struct page **pages, uint32_t *pageTable,
 	struct page __maybe_unused *page;
 	spinlock_t * ptl;
 	pte_t * pte;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0)
 	pgd_t * pgd;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 	p4d_t * p4d;
 #endif
 	pud_t * pud;
 	pmd_t * pmd;
+#endif
 
 	status = 0;
 	Address = 0;
@@ -972,6 +974,14 @@ static int rga2_MapUserMemory(struct page **pages, uint32_t *pageTable,
 			status = RGA2_OUT_OF_RESOURCES;
 			break;
 		}
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
+		if (follow_pte(current->mm, (Memory + i) << PAGE_SHIFT, &pte, &ptl)) {
+			pr_err("RGA2 failed to follow_pte, result = %d, pageCount = %d\n",
+				result, pageCount);
+			status = RGA2_OUT_OF_RESOURCES;
+			break;
+		}
+#else
 		pgd = pgd_offset(current->mm, (Memory + i) << PAGE_SHIFT);
 		if (pgd_none(*pgd) || unlikely(pgd_bad(*pgd))) {
 			pr_err("RGA2 failed to get pgd, result = %d, pageCount = %d\n",
@@ -1016,6 +1026,7 @@ static int rga2_MapUserMemory(struct page **pages, uint32_t *pageTable,
 			status = RGA2_OUT_OF_RESOURCES;
 			break;
 		}
+#endif
 		pfn = pte_pfn(*pte);
 		Address = ((pfn << PAGE_SHIFT) |
 			  (((unsigned long)((Memory + i) << PAGE_SHIFT)) & ~PAGE_MASK));

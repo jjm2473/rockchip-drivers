@@ -42,12 +42,14 @@ static int rga_get_user_pages_from_vma(struct page **pages, unsigned long Memory
 	struct vm_area_struct *vma;
 	spinlock_t *ptl;
 	pte_t *pte;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0)
 	pgd_t *pgd;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 	p4d_t *p4d;
 #endif
 	pud_t *pud;
 	pmd_t *pmd;
+#endif
 	unsigned long pfn;
 
 	for (i = 0; i < pageCount; i++) {
@@ -58,6 +60,13 @@ static int rga_get_user_pages_from_vma(struct page **pages, unsigned long Memory
 			break;
 		}
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
+		if (follow_pte(current_mm, (Memory + i) << PAGE_SHIFT, &pte, &ptl)) {
+			pr_err("page[%d] failed to follow_pte\n", i);
+			ret = RGA_OUT_OF_RESOURCES;
+			break;
+		}
+#else
 		pgd = pgd_offset(current_mm, (Memory + i) << PAGE_SHIFT);
 		if (pgd_none(*pgd) || unlikely(pgd_bad(*pgd))) {
 			pr_err("page[%d] failed to get pgd\n", i);
@@ -100,6 +109,7 @@ static int rga_get_user_pages_from_vma(struct page **pages, unsigned long Memory
 			ret = RGA_OUT_OF_RESOURCES;
 			break;
 		}
+#endif
 
 		pfn = pte_pfn(*pte);
 		pages[i] = pfn_to_page(pfn);
