@@ -15,7 +15,6 @@
 #include <linux/iommu.h>
 #include <linux/pfn_t.h>
 #include <linux/version.h>
-#include <linux/version_compat_defs.h>
 #include <asm/cacheflush.h>
 
 #if KERNEL_VERSION(5, 10, 0) <= LINUX_VERSION_CODE
