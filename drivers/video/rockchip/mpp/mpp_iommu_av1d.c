@@ -10,7 +10,12 @@
 #include <linux/compiler.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+#include <linux/version.h>
+#if KERNEL_VERSION(6, 6, 0) > LINUX_VERSION_CODE
 #include <linux/dma-iommu.h>
+#else
+#include "../drivers/iommu/dma-iommu.h"
+#endif
 #include <linux/dma-mapping.h>
 #include <linux/dma-map-ops.h>
 #include <linux/errno.h>
@@ -353,8 +358,12 @@ out:
 	return ret;
 }
 
+#if KERNEL_VERSION(6, 0, 0) > LINUX_VERSION_CODE
 static bool av1_iommu_is_attach_deferred(struct iommu_domain *domain,
 					struct device *dev)
+#else
+static bool av1_iommu_is_attach_deferred(struct device *dev)
+#endif
 {
 	struct av1_iommudata *data = dev_iommu_priv_get(dev);
 
@@ -375,9 +384,11 @@ static struct iommu_domain *av1_iommu_domain_alloc(unsigned type)
 	if (!av1_domain)
 		return NULL;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	if (type == IOMMU_DOMAIN_DMA &&
 	    iommu_get_dma_cookie(&av1_domain->domain))
 		goto err_free_domain;
+#endif
 
 	/*
 	 * av132xx iommus use a 2 level pagetable.
@@ -427,9 +438,13 @@ err_unmap_dt:
 err_free_dt:
 	free_page((unsigned long)av1_domain->dt);
 err_put_cookie:
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	if (type == IOMMU_DOMAIN_DMA)
 		iommu_put_dma_cookie(&av1_domain->domain);
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 err_free_domain:
+#endif
 	kfree(av1_domain);
 
 	return NULL;
@@ -717,8 +732,10 @@ static void av1_iommu_domain_free(struct iommu_domain *domain)
 			 SPAGE_SIZE, DMA_TO_DEVICE);
 	free_page((unsigned long)av1_domain->pta);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 	if (domain->type == IOMMU_DOMAIN_DMA)
 		iommu_put_dma_cookie(&av1_domain->domain);
+#endif
 	kfree(av1_domain);
 }
 
@@ -803,20 +820,34 @@ static void av1_iommu_probe_finalize(struct device *dev)
 
 static struct iommu_ops av1_iommu_ops = {
 	.domain_alloc = av1_iommu_domain_alloc,
+	.probe_device = av1_iommu_probe_device,
+	.release_device = av1_iommu_release_device,
+	.is_attach_deferred = av1_iommu_is_attach_deferred,
+	.device_group = av1_iommu_device_group,
+	.pgsize_bitmap = AV1_IOMMU_PGSIZE_BITMAP,
+	.of_xlate = av1_iommu_of_xlate,
+	.probe_finalize = av1_iommu_probe_finalize,
+#if KERNEL_VERSION(6, 0, 0) > LINUX_VERSION_CODE
 	.domain_free = av1_iommu_domain_free,
 	.attach_dev = av1_iommu_attach_device,
 	.detach_dev = av1_iommu_detach_device,
 	.map = av1_iommu_map,
 	.unmap = av1_iommu_unmap,
 	.flush_iotlb_all = av1_iommu_flush_tlb_all,
-	.probe_device = av1_iommu_probe_device,
-	.release_device = av1_iommu_release_device,
 	.iova_to_phys = av1_iommu_iova_to_phys,
-	.is_attach_deferred = av1_iommu_is_attach_deferred,
-	.device_group = av1_iommu_device_group,
-	.pgsize_bitmap = AV1_IOMMU_PGSIZE_BITMAP,
-	.of_xlate = av1_iommu_of_xlate,
-	.probe_finalize = av1_iommu_probe_finalize,
+#else
+	.default_domain_ops = &(const struct iommu_domain_ops) {
+		.attach_dev	= av1_iommu_attach_device,
+#if KERNEL_VERSION(6, 6, 0) > LINUX_VERSION_CODE
+		.detach_dev = av1_iommu_detach_device,
+#endif
+		.map		= av1_iommu_map,
+		.unmap		= av1_iommu_unmap,
+		.flush_iotlb_all = av1_iommu_flush_tlb_all,
+		.iova_to_phys	= av1_iommu_iova_to_phys,
+		.free		= av1_iommu_domain_free,
+	}
+#endif
 };
 
 static const struct of_device_id av1_iommu_dt_ids[] = {
@@ -890,17 +921,23 @@ static int av1_iommu_probe(struct platform_device *pdev)
 	if (err)
 		goto err_put_group;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
 	iommu_device_set_ops(&iommu->iommu, &av1_iommu_ops);
 	iommu_device_set_fwnode(&iommu->iommu, &dev->of_node->fwnode);
 
 	err = iommu_device_register(&iommu->iommu);
+#else
+	err = iommu_device_register(&iommu->iommu, &av1_iommu_ops, dev);
+#endif
 	if (err)
 		goto err_remove_sysfs;
 
 	if (!dma_dev)
 		dma_dev = &pdev->dev;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
 	bus_set_iommu(&av1dec_bus, &av1_iommu_ops);
+#endif
 
 	pm_runtime_enable(dev);
 

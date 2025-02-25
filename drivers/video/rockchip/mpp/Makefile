@@ -23,6 +23,7 @@ rk_vcodec-$(CONFIG_ROCKCHIP_MPP_IEP2)   += mpp_iep2.o
 rk_vcodec-$(CONFIG_ROCKCHIP_MPP_JPGDEC) += mpp_jpgdec.o
 rk_vcodec-$(CONFIG_ROCKCHIP_MPP_JPGENC) += mpp_jpgenc.o
 rk_vcodec-$(CONFIG_ROCKCHIP_MPP_AV1DEC) += mpp_av1dec.o
+rk_vcodec-$(CONFIG_ROCKCHIP_MPP_AV1DEC) += mpp_iommu_av1d.o
 rk_vcodec-$(CONFIG_ROCKCHIP_MPP_VDPP)   += mpp_vdpp.o
 
 # hack for workaround
