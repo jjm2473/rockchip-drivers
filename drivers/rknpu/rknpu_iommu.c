@@ -93,6 +93,10 @@ static int rknpu_dma_info_to_prot(enum dma_data_direction dir, bool coherent)
 	}
 }
 
+#if KERNEL_VERSION(6, 6, 0) <= LINUX_VERSION_CODE
+#define sg_is_dma_bus_address sg_dma_is_bus_address
+#endif
+
 /*
  * Prepare a successfully-mapped scatterlist to give back to the caller.
  *
