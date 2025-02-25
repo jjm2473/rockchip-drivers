@@ -16,7 +16,6 @@
 #include <linux/iommu.h>
 #include <linux/pfn_t.h>
 #include <linux/version.h>
-#include <linux/version_compat_defs.h>
 #include <asm/cacheflush.h>
 #include <linux/vmalloc.h>
 
