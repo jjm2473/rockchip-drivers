@@ -221,9 +221,16 @@ static int npu_opp_config_regulators(struct device *dev,
 					      count, &rknpu_dev->opp_info);
 }
 
+#ifndef BUILD_OPENWRT
 static int npu_opp_config_clks(struct device *dev, struct opp_table *opp_table,
 			       struct dev_pm_opp *opp, void *data,
 			       bool scaling_down)
+#else
+static int npu_opp_config_clks(struct device *dev, struct opp_table *opp_table,
+			       struct dev_pm_opp *old_opp,
+			       struct dev_pm_opp *opp, void *data,
+			       bool scaling_down)
+#endif
 {
 	struct rknpu_device *rknpu_dev = dev_get_drvdata(dev);
 
