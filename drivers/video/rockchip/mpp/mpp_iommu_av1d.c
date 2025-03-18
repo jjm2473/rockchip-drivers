@@ -836,6 +836,7 @@ static struct iommu_ops av1_iommu_ops = {
 	.flush_iotlb_all = av1_iommu_flush_tlb_all,
 	.iova_to_phys = av1_iommu_iova_to_phys,
 #else
+	.owner = THIS_MODULE,
 	.default_domain_ops = &(const struct iommu_domain_ops) {
 		.attach_dev	= av1_iommu_attach_device,
 #if KERNEL_VERSION(6, 6, 0) > LINUX_VERSION_CODE
