@@ -101,6 +101,14 @@ static int mpp_add_driver(struct mpp_service *srv,
 		     &srv->grf_infos[type],
 		     grf_name);
 
+#if IS_ENABLED(CONFIG_ROCKCHIP_MPP_AV1DEC)
+	if (type == MPP_DRIVER_AV1DEC) {
+		ret = platform_driver_register(&rockchip_av1_iommu_driver);
+		if (ret)
+			return ret;
+	}
+#endif
+
 	ret = platform_driver_register(driver);
 	if (ret)
 		return ret;

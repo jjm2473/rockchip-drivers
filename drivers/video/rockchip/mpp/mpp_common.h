@@ -853,4 +853,6 @@ extern struct platform_driver rockchip_av1dec_driver;
 extern struct platform_driver rockchip_jpgenc_driver;
 extern struct platform_driver rockchip_vdpp_driver;
 
+extern struct platform_driver rockchip_av1_iommu_driver;
+
 #endif
