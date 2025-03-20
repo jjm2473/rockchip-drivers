@@ -686,7 +686,7 @@ int mpp_iommu_reserve_iova(struct mpp_iommu_info *info, dma_addr_t iova, size_t 
 	pfn_lo = iova_pfn(iovad, iova);
 	pfn_hi = iova_pfn(iovad, iova + size - 1);
 	if (!reserve_iova(iovad, pfn_lo, pfn_hi))
-		return -EINVAL;
+		return -ENOMEM;
 
 	return 0;
 
