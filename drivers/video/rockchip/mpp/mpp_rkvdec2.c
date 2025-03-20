@@ -1816,7 +1816,7 @@ static int rkvdec2_alloc_rcbbuf(struct platform_device *pdev, struct rkvdec2_dev
 	/* alloc reserve iova for rcb */
 	ret = mpp_iommu_reserve_iova(dec->mpp.iommu_info, iova, rcb_size);
 	if (ret) {
-		dev_err(dev, "alloc rcb iova error.\n");
+		dev_err(dev, "alloc rcb iova error %d. You may need to disable iommu passthrough\n", ret);
 		return ret;
 	}
 	/* get sram device node */
