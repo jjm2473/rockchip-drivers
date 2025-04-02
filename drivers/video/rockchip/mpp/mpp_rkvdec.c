@@ -1320,6 +1320,13 @@ static int rkvdec_3328_init(struct mpp_dev *mpp)
 	mpp->fault_handler = rkvdec_3328_iommu_hdl;
 
 	ret = rkvdec_devfreq_init(mpp);
+	if (ret) {
+		dev_err(mpp->dev, "failed to add vdec devfreq: %d\n", ret);
+		if (-EPROBE_DEFER != ret) {
+			dev_err(mpp->dev, "init vdec without devfreq\n");
+			ret = 0;
+		}
+	}
 done:
 	return ret;
 }
