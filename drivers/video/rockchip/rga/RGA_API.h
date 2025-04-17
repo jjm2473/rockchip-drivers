@@ -3,7 +3,9 @@
 #define __RGA_API_H__
 
 #include <linux/miscdevice.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 
 #include "rga_reg_info.h"
 #include "rga.h"
@@ -19,7 +21,9 @@ struct rga_drvdata {
 
 	struct delayed_work power_off_work;
 	void (*rga_irq_callback)(int rga_retval);   //callback function used by aync call
+#ifdef CONFIG_PM_WAKELOCKS
 	struct wake_lock wake_lock;
+#endif
 
 	struct clk *pd_rga;
 	struct clk *aclk_rga;

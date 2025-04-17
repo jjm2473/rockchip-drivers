@@ -46,7 +46,9 @@
 #include <linux/uaccess.h>
 #include <linux/version.h>
 #include <linux/wait.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/pm_runtime.h>
 #include <linux/sched/mm.h>
 
@@ -293,7 +295,9 @@ struct rve_drvdata_t {
 	int num_of_scheduler;
 
 	struct delayed_work power_off_work;
+#ifdef CONFIG_PM_WAKELOCKS
 	struct wake_lock wake_lock;
+#endif
 
 	struct rve_mm *mm;
 
