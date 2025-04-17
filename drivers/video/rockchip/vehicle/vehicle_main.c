@@ -24,7 +24,9 @@
 #include <linux/clk.h>
 #include <linux/clkdev.h>
 #include <linux/completion.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/of_gpio.h>
 #include <linux/of_address.h>
 #include <linux/of_irq.h>
@@ -55,7 +57,9 @@ struct vehicle {
 	struct device	*dev;
 	struct pinctrl *pinctrl;
 	struct pinctrl_state *pins_default;
+#ifdef CONFIG_PM_WAKELOCKS
 	struct wake_lock wake_lock;
+#endif
 	struct gpio_detect gpio_data;
 	struct vehicle_cif cif;
 	struct vehicle_ad_dev ad;
@@ -339,7 +343,9 @@ static int vehicle_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_init(&vehicle_info->wake_lock, WAKE_LOCK_SUSPEND, "vehicle");
+#endif
 
 	dev_info(vehicle_info->dev, "vehicle driver probe success\n");
 
@@ -399,7 +405,11 @@ static void vehicle_exit_complete_notify(struct vehicle *v)
 	status = kasprintf(GFP_KERNEL, "vehicle_exit=done");
 	envp[0] = status;
 	envp[1] = NULL;
+
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_timeout(&v->wake_lock, 5 * HZ);
+#endif
+
 	kobject_uevent_env(&v->dev->kobj, KOBJ_CHANGE, envp);
 
 	kfree(status);

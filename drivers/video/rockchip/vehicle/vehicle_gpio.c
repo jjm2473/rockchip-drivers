@@ -19,7 +19,9 @@
 #include <linux/clk.h>
 #include <linux/clkdev.h>
 #include <linux/completion.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/gpio/consumer.h>
 #include <linux/of_irq.h>
 #include <linux/interrupt.h>

@@ -3,7 +3,9 @@
 #define __RGA_API_H__
 
 #include <linux/miscdevice.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 
 #include "rga2_reg_info.h"
 #include "rga2_debugger.h"
@@ -35,7 +37,9 @@ struct rga2_drvdata_t {
 	int irq;
 
 	struct delayed_work power_off_work;
+#ifdef CONFIG_PM_WAKELOCKS
 	struct wake_lock wake_lock;
+#endif
 	void (*rga_irq_callback)(int rga_retval);
 
 	struct clk *aclk_rga2;

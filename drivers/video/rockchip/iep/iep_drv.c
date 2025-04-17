@@ -24,7 +24,9 @@
 #include <linux/poll.h>
 #include <linux/dma-mapping.h>
 #include <linux/fb.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/of.h>
 #include <linux/of_platform.h>
 #include <linux/io.h>
@@ -69,7 +71,9 @@ struct iep_drvdata {
 
 	/* clk enable or disable */
 	bool enable;
+#ifdef CONFIG_PM_WAKELOCKS
 	struct wake_lock wake_lock;
+#endif
 
 	atomic_t iep_int;
 	atomic_t mmu_page_fault;
@@ -232,7 +236,9 @@ static void iep_power_on(void)
 	clk_prepare_enable(iep_drvdata1->hclk_iep);
 #endif
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock(&iep_drvdata1->wake_lock);
+#endif
 
 	iep_iommu_attach(iep_service.iommu_info);
 
@@ -269,7 +275,9 @@ static void iep_power_off(void)
 	pm_runtime_put(iep_drvdata1->dev);
 #endif
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_unlock(&iep_drvdata1->wake_lock);
+#endif
 	iep_service.enable = false;
 }
 
@@ -954,7 +962,9 @@ static int iep_drv_probe(struct platform_device *pdev)
 
 	iep_service.enable = false;
 	INIT_DELAYED_WORK(&data->power_off_work, iep_power_off_work);
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_init(&data->wake_lock, WAKE_LOCK_SUSPEND, "iep");
+#endif
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 
@@ -1064,7 +1074,9 @@ err_misc_register:
 	free_irq(data->irq0, pdev);
 err_irq:
 err_ioremap:
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_destroy(&data->wake_lock);
+#endif
 #ifdef IEP_CLK_ENABLE
 err_clock:
 #endif
@@ -1078,7 +1090,9 @@ static int iep_drv_remove(struct platform_device *pdev)
 	iep_iommu_info_destroy(iep_service.iommu_info);
 	iep_service.iommu_info = NULL;
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_destroy(&data->wake_lock);
+#endif
 
 	misc_deregister(&(data->miscdev));
 	free_irq(data->irq0, &data->miscdev);

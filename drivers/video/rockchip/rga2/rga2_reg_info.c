@@ -28,7 +28,9 @@
 #include <asm/cacheflush.h>
 #include <linux/slab.h>
 #include <linux/fb.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/version.h>
 
 #include "rga2_reg_info.h"

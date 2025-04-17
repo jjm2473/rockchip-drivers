@@ -817,7 +817,9 @@ static int __init rve_init(void)
 
 	mutex_init(&rve_drvdata->lock);
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_init(&rve_drvdata->wake_lock, WAKE_LOCK_SUSPEND, "rve");
+#endif
 
 	ret = platform_driver_register(&rve_driver);
 	if (ret != 0) {
@@ -865,7 +867,9 @@ static void __exit rve_exit(void)
 
 	rve_session_manager_remove(&rve_drvdata->session_manager);
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_destroy(&rve_drvdata->wake_lock);
+#endif
 
 #ifdef CONFIG_SYNC_FILE
 	rve_fence_context_free(rve_drvdata->fence_ctx);

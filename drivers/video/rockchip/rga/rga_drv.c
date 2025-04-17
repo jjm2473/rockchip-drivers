@@ -41,7 +41,9 @@
 #include <asm/cacheflush.h>
 #include <linux/slab.h>
 #include <linux/fb.h>
+#ifdef CONFIG_PM_WAKELOCKS
 #include <linux/wakelock.h>
+#endif
 #include <linux/version.h>
 #include <linux/debugfs.h>
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0))
@@ -541,7 +543,9 @@ static void rga_power_on(void)
 		clk_prepare_enable(rga_drvdata->pd_rga);
 #endif
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock(&rga_drvdata->wake_lock);
+#endif
 	rga_service.enable = true;
 }
 
@@ -572,7 +576,10 @@ static void rga_power_off(void)
 	clk_disable_unprepare(rga_drvdata->aclk_rga);
 	clk_disable_unprepare(rga_drvdata->hclk_rga);
 #endif
+
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_unlock(&rga_drvdata->wake_lock);
+#endif
 	rga_service.enable = false;
 }
 
@@ -1839,7 +1846,9 @@ static int rga_drv_probe(struct platform_device *pdev)
 	}
 
 	INIT_DELAYED_WORK(&data->power_off_work, rga_power_off_work);
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_init(&data->wake_lock, WAKE_LOCK_SUSPEND, "rga");
+#endif
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 4, 0))
 	data->pd_rga = devm_clk_get(&pdev->dev, "pd_rga");
@@ -1911,7 +1920,9 @@ err_misc_register:
 err_irq:
 	iounmap(data->rga_base);
 err_ioremap:
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_destroy(&data->wake_lock);
+#endif
 	//kfree(data);
 
 	return ret;
@@ -1922,7 +1933,9 @@ static int rga_drv_remove(struct platform_device *pdev)
 	struct rga_drvdata *data = platform_get_drvdata(pdev);
 	DBG("%s [%d]\n",__FUNCTION__,__LINE__);
 
+#ifdef CONFIG_PM_WAKELOCKS
 	wake_lock_destroy(&data->wake_lock);
+#endif
 	misc_deregister(&(data->miscdev));
 	free_irq(data->irq, &data->miscdev);
 	iounmap((void __iomem *)(data->rga_base));
