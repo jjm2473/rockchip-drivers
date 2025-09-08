@@ -20,9 +20,9 @@
 #include <linux/version.h>
 #include <soc/rockchip/rockchip_opp_select.h>
 
-#include "../../clk/rockchip/clk.h"
-#include "../../opp/opp.h"
-#include "../../devfreq/governor.h"
+#include <../drivers/clk/rockchip/clk.h>
+#include <../drivers/opp/opp.h>
+#include <../drivers/devfreq/governor.h>
 
 #define MAX_PROP_NAME_LEN	6
 #define SEL_TABLE_END		~1

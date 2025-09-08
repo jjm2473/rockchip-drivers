@@ -40,9 +40,9 @@
 #include <linux/earlysuspend.h>
 #endif
 
-#include "../../opp/opp.h"
-#include "../../regulator/internal.h"
-#include "../../thermal/thermal_core.h"
+#include <../drivers/opp/opp.h>
+#include <../drivers/regulator/internal.h>
+#include <../drivers/thermal/thermal_core.h>
 
 #define CPU_REBOOT_FREQ		816000 /* kHz */
 #define VIDEO_1080P_SIZE	(1920 * 1080)
