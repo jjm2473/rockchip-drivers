@@ -136,6 +136,7 @@ static int rk3588_npu_get_soc_info(struct device *dev, struct device_node *np,
 	return ret;
 }
 
+#ifdef CONFIG_CPU_RV1126B
 static int rv1126b_npu_get_soc_info(struct device *dev, struct device_node *np,
 				    int *bin, int *process)
 {
@@ -171,6 +172,7 @@ static int rv1126b_npu_get_soc_info(struct device *dev, struct device_node *np,
 
 	return ret;
 }
+#endif
 
 #if KERNEL_VERSION(6, 1, 0) <= LINUX_VERSION_CODE
 static int rk3588_npu_set_soc_info(struct device *dev, struct device_node *np,
@@ -303,6 +305,7 @@ static const struct rockchip_opp_data rk3588_npu_opp_data = {
 #endif
 };
 
+#ifdef CONFIG_CPU_RV1126B
 static const struct rockchip_opp_data rv1126b_npu_opp_data = {
 	.is_use_pvtpll = true,
 	.get_soc_info = rv1126b_npu_get_soc_info,
@@ -312,6 +315,7 @@ static const struct rockchip_opp_data rv1126b_npu_opp_data = {
 	.config_clks = npu_opp_config_clks,
 #endif
 };
+#endif
 
 static const struct of_device_id rockchip_npu_of_match[] = {
 	{
@@ -330,10 +334,12 @@ static const struct of_device_id rockchip_npu_of_match[] = {
 		.compatible = "rockchip,rk3588s",
 		.data = (void *)&rk3588_npu_opp_data,
 	},
+#ifdef CONFIG_CPU_RV1126B
 	{
 		.compatible = "rockchip,rv1126b",
 		.data = (void *)&rv1126b_npu_opp_data,
 	},
+#endif
 	{},
 };
 
