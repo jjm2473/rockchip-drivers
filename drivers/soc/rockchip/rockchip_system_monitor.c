@@ -1922,6 +1922,7 @@ static void system_monitor_early_min_volt_function(struct work_struct *work)
 static DECLARE_DELAYED_WORK(system_monitor_early_min_volt_work,
 			    system_monitor_early_min_volt_function);
 
+#if IS_ENABLED(CONFIG_CPU_RK3506)
 static int system_monitor_ddr_trefi_update(u32 ref_mode)
 {
 	struct arm_smccc_res res;
@@ -1942,6 +1943,7 @@ static __maybe_unused int rk3506_system_monitor_init(struct platform_device *pde
 
 	return 0;
 }
+#endif
 
 static const struct of_device_id rockchip_system_monitor_of_match[] = {
 	{ .compatible = "rockchip,system-monitor", .data = NULL },

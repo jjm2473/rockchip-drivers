@@ -2090,8 +2090,15 @@ static int rockchip_pvtpll_set_volt_sel(struct device *dev,
 		return 0;
 
 	if (!info->pvtpll_smc)
+#if IS_REACHABLE(CONFIG_ROCKCHIP_CLK_PVTPLL)
 		return rockchip_pvtpll_volt_sel_adjust(info->pvtpll_clk_id,
 						       info->volt_sel);
+#else
+	{
+		//WARN_ONCE(1, "CONFIG_ROCKCHIP_CLK_PVTPLL not enabled, should not going to here\n");
+		return 0;
+	}
+#endif
 
 	res = sip_smc_pvtpll_config(PVTPLL_VOLT_SEL, info->pvtpll_clk_id,
 				    (u32)info->volt_sel, 0, 0, 0, 0);
