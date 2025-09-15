@@ -91,6 +91,7 @@ static int rk3576_npu_set_read_margin(struct device *dev,
 	regmap_write(opp_info->grf, 0x0c, 0x003c0000 | (rm << 2));
 	regmap_write(opp_info->grf, 0x10, 0x001c0000 | (rm << 2));
 
+	opp_info->current_rm = rm;
 	return 0;
 }
 
@@ -401,6 +402,7 @@ int rknpu_devfreq_init(struct rknpu_device *rknpu_dev)
 	if (IS_ERR(rknpu_dev->mdev_info)) {
 		dev_dbg(dev, "without system monitor\n");
 		rknpu_dev->mdev_info = NULL;
+		npu_mdevp.opp_info->is_rate_volt_checked = true;
 	}
 
 	rknpu_dev->current_freq = clk_get_rate(rknpu_dev->clks[0].clk);

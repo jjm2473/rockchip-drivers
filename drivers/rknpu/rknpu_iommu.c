@@ -425,7 +425,7 @@ int rknpu_iommu_switch_domain(struct rknpu_device *rknpu_dev, int domain_id)
 {
 	struct iommu_domain *src_domain = NULL;
 	struct iommu_domain *dst_domain = NULL;
-	struct bus_type *bus = NULL;
+	const struct bus_type *bus = NULL;
 	int src_domain_id = 0;
 	int ret = -EINVAL;
 
