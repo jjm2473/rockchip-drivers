@@ -27,7 +27,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/regmap.h>
 #include <linux/reset.h>
-#include <linux/rk_hdmirx_config.h>
+#include <uapi/linux/rk_hdmirx_config.h>
 #include <linux/rockchip/rockchip_sip.h>
 #include <linux/seq_file.h>
 #include <linux/sync_file.h>
