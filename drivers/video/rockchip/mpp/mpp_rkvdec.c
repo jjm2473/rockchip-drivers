@@ -1214,7 +1214,7 @@ static int rkvdec_3328_iommu_hdl(struct iommu_domain *iommu,
 		page_iova = round_down(iova, IOMMU_PAGE_SIZE);
 		ret = iommu_map(mpp->iommu_info->domain, page_iova,
 				page_to_phys(dec->aux_page), IOMMU_PAGE_SIZE,
-				IOMMU_READ | IOMMU_WRITE);
+				IOMMU_READ | IOMMU_WRITE, GFP_KERNEL);
 		if (!ret)
 			dec->aux_iova = page_iova;
 	}
@@ -1922,6 +1922,7 @@ struct platform_driver rockchip_rkvdec_driver = {
 	.driver = {
 		.name = RKVDEC_DRIVER_NAME,
 		.of_match_table = of_match_ptr(mpp_rkvdec_dt_match),
+		.pm = &mpp_common_pm_ops,
 	},
 };
 EXPORT_SYMBOL(rockchip_rkvdec_driver);

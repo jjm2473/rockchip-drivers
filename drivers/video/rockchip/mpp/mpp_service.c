@@ -100,6 +100,9 @@ static int mpp_add_driver(struct mpp_service *srv,
 		     &srv->grf_infos[type],
 		     grf_name);
 
+	if (IS_ENABLED(CONFIG_ARM_DMA_USE_IOMMU))
+		driver->driver_managed_dma = (srv->iommu_shared_mask & BIT(type)) ? true : false;
+
 	ret = platform_driver_register(driver);
 	if (ret)
 		return ret;
@@ -309,6 +312,39 @@ static int mpp_show_support_device(struct seq_file *file, void *v)
 	return 0;
 }
 
+static int mpp_show_device_load(struct seq_file *file, void *v)
+{
+	u32 i, j;
+	struct mpp_service *srv = file->private;
+
+	if (!srv->load_interval) {
+		seq_puts(file, "please set load_interval first!!!\n");
+		seq_puts(file, "e.g. set 1000ms to load_interval:\n");
+		seq_puts(file, "echo 1000 > /proc/mpp_service/load_interval\n");
+		return 0;
+	}
+
+	for (i = 0; i < MPP_DEVICE_BUTT; i++) {
+		struct mpp_taskqueue *queue = srv->task_queues[i];
+
+		if (!queue)
+			continue;
+
+		for (j = 0; j < MPP_MAX_CORE_NUM; j++) {
+			struct mpp_dev *mpp = queue->cores[j];
+
+			if (!mpp)
+				continue;
+			seq_printf(file, "%-25s load: %3d.%02d%% utilization: %3d.%02d%%\n",
+				   dev_name(mpp->dev),
+				   mpp->load_info.load, mpp->load_info.load_frac,
+				   mpp->load_info.utilization, mpp->load_info.utilization_frac);
+		}
+	}
+
+	return 0;
+}
+
 static int mpp_procfs_init(struct mpp_service *srv)
 {
 	srv->procfs = proc_mkdir(MPP_SERVICE_NAME, NULL);
@@ -327,7 +363,12 @@ static int mpp_procfs_init(struct mpp_service *srv)
 	/* show support devices */
 	proc_create_single_data("supports-device", 0444,
 				srv->procfs, mpp_show_support_device, srv);
+	srv->timing_en = 1;
 	mpp_procfs_create_u32("timing_en", 0644, srv->procfs, &srv->timing_en);
+	/* show per device load info */
+	proc_create_single_data("load", 0444, srv->procfs, mpp_show_device_load, srv);
+	srv->load_interval = 0;
+	mpp_procfs_create_u32("load_interval", 0644, srv->procfs, &srv->load_interval);
 
 	return 0;
 }
@@ -361,7 +402,7 @@ static int mpp_service_probe(struct platform_device *pdev)
 	atomic_set(&srv->shutdown_request, 0);
 	platform_set_drvdata(pdev, srv);
 
-	srv->cls = class_create(THIS_MODULE, MPP_CLASS_NAME);
+	srv->cls = class_create(MPP_CLASS_NAME);
 	if (PTR_ERR_OR_ZERO(srv->cls))
 		return PTR_ERR(srv->cls);
 
@@ -405,6 +446,9 @@ static int mpp_service_probe(struct platform_device *pdev)
 			srv->reset_groups[i] = group;
 		}
 	}
+
+	of_property_read_u32(np, "rockchip,iommu-shared-mask",
+			     &srv->iommu_shared_mask);
 
 	ret = mpp_register_service(srv, MPP_SERVICE_NAME);
 	if (ret) {
