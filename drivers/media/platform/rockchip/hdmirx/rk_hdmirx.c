@@ -1321,6 +1321,20 @@ static int hdmirx_get_edid(struct file *file, void *fh,
 	return 0;
 }
 
+static int hdmirx_g_parm(struct file *file, void *priv,
+			 struct v4l2_streamparm *parm)
+{
+	struct hdmirx_stream *stream = video_drvdata(file);
+	struct rk_hdmirx_dev *hdmirx_dev = stream->hdmirx_dev;
+
+	if (parm->type != V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+		return -EINVAL;
+
+	parm->parm.capture.timeperframe = v4l2_calc_timeperframe(&hdmirx_dev->timings);
+
+	return 0;
+}
+
 static int hdmirx_dv_timings_cap(struct file *file, void *fh,
 				   struct v4l2_dv_timings_cap *cap)
 {
@@ -1767,6 +1781,19 @@ static int hdmirx_enum_input(struct file *file, void *priv,
 	strscpy(input->name, "hdmirx", sizeof(input->name));
 	input->capabilities = V4L2_IN_CAP_DV_TIMINGS;
 
+	return 0;
+}
+
+static int hdmirx_get_input(struct file *file, void *priv, unsigned int *i)
+{
+	*i = 0;
+	return 0;
+}
+
+static int hdmirx_set_input(struct file *file, void *priv, unsigned int i)
+{
+	if (i)
+		return -EINVAL;
 	return 0;
 }
 
@@ -2600,8 +2627,11 @@ static const struct v4l2_ioctl_ops hdmirx_v4l2_ioctl_ops = {
 	.vidioc_query_dv_timings = hdmirx_query_dv_timings,
 	.vidioc_dv_timings_cap = hdmirx_dv_timings_cap,
 	.vidioc_enum_input = hdmirx_enum_input,
+	.vidioc_g_input = hdmirx_get_input,
+	.vidioc_s_input = hdmirx_set_input,
 	.vidioc_g_edid = hdmirx_get_edid,
 	.vidioc_s_edid = hdmirx_set_edid,
+	.vidioc_g_parm = hdmirx_g_parm,
 
 	.vidioc_reqbufs = vb2_ioctl_reqbufs,
 	.vidioc_querybuf = vb2_ioctl_querybuf,
