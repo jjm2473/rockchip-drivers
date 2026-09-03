@@ -477,7 +477,7 @@ static int fill_scaling_list_pps(struct rkvdec_task *task,
 		goto access_failed;
 	}
 
-	ret = dma_buf_vmap(dmabuf, &map);
+	ret = dma_buf_vmap_unlocked(dmabuf, &map);
 	if (ret) {
 		mpp_err("can't access the pps buffer\n");
 		goto vmap_failed;
@@ -511,7 +511,7 @@ static int fill_scaling_list_pps(struct rkvdec_task *task,
 	}
 
 task_fd_failed:
-	dma_buf_vunmap(dmabuf, &map);
+	dma_buf_vunmap_unlocked(dmabuf, &map);
 vmap_failed:
 	dma_buf_end_cpu_access(dmabuf, DMA_FROM_DEVICE);
 access_failed:
@@ -1903,7 +1903,7 @@ static int rkvdec_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int rkvdec_remove(struct platform_device *pdev)
+static void rkvdec_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct mpp_dev *mpp = platform_get_drvdata(pdev);
@@ -1911,8 +1911,6 @@ static int rkvdec_remove(struct platform_device *pdev)
 	dev_info(dev, "remove device\n");
 	mpp_dev_remove(mpp);
 	rkvdec_procfs_remove(mpp);
-
-	return 0;
 }
 
 struct platform_driver rockchip_rkvdec_driver = {

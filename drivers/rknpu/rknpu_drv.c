@@ -569,12 +569,12 @@ static int rknpu_release(struct inode *inode, struct file *file)
 		if (entry->kv_addr) {
 			struct iosys_map map =
 				IOSYS_MAP_INIT_VADDR(entry->kv_addr);
-			dma_buf_vunmap(entry->dmabuf, &map);
+			dma_buf_vunmap_unlocked(entry->dmabuf, &map);
 			entry->kv_addr = NULL;
 		}
 
-		dma_buf_unmap_attachment(entry->attachment, entry->sgt,
-					 DMA_BIDIRECTIONAL);
+		dma_buf_unmap_attachment_unlocked(entry->attachment, entry->sgt,
+						  DMA_BIDIRECTIONAL);
 		dma_buf_detach(entry->dmabuf, entry->attachment);
 
 		if (!entry->owner)
@@ -1561,7 +1561,7 @@ err_remove_drv:
 	return ret;
 }
 
-static int rknpu_remove(struct platform_device *pdev)
+static void rknpu_remove(struct platform_device *pdev)
 {
 	struct rknpu_device *rknpu_dev = platform_get_drvdata(pdev);
 	int i = 0;
@@ -1621,8 +1621,6 @@ static int rknpu_remove(struct platform_device *pdev)
 	}
 
 	pm_runtime_disable(&pdev->dev);
-
-	return 0;
 }
 
 #ifndef FPGA_PLATFORM

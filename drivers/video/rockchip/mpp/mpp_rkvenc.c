@@ -977,7 +977,7 @@ static int __maybe_unused rv1126_get_soc_info(struct device *dev,
 			*bin = 0;
 	}
 	if (*bin >= 0)
-		dev_info(dev, "bin=%d\n", *bin);
+		dev_dbg(dev, "bin=%d\n", *bin);
 
 	return ret;
 }
@@ -1442,7 +1442,7 @@ failed_get_irq:
 	return ret;
 }
 
-static int rkvenc_remove(struct platform_device *pdev)
+static void rkvenc_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct mpp_dev *mpp = dev_get_drvdata(dev);
@@ -1450,8 +1450,6 @@ static int rkvenc_remove(struct platform_device *pdev)
 	dev_info(dev, "remove device\n");
 	mpp_dev_remove(mpp);
 	rkvenc_procfs_remove(mpp);
-
-	return 0;
 }
 
 struct platform_driver rockchip_rkvenc_driver = {
